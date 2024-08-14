@@ -4,7 +4,7 @@ metadata:
   name: order-configmap
   namespace: ricardofood
 data:
-  MYSQL_URL: "jdbc:mysql://mysql:3306/ricardofood?createDatabaseIfNotExist=true"
+  MYSQL_URL: "jdbc:mysql://mysql:3306/ricardofood-order-prod?createDatabaseIfNotExist=true"
   MYSQL_USER: "root"
   MYSQL_PASSWORD: "senha123"
   RABBITMQ_HOST: "rabbitmq"
