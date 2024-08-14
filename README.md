@@ -1,8 +1,6 @@
 # RicardoFood DevOps Repository
 
-Welcome to the RicardoFood DevOps repository! 
-
-This repository is dedicated to storing all DevOps-related configurations and scripts for the RicardoFood project.
+Welcome to the RicardoFood DevOps repository! This repository is dedicated to storing all DevOps-related configurations and scripts for the RicardoFood project.
 
 ## Overview
 
@@ -38,7 +36,23 @@ To test the RicardoFood project in a Minikube environment, follow these steps:
    kubectl apply -f service-account.yaml
    ```
 
-3. **Retrieve the Service Account Token:**
+3. **Deploy the Database:**
+
+   Apply the following commands to deploy the MySQL database:
+
+   ```bash
+   kubectl apply -f db/mysql-configmap.yaml -f db/mysql-pvc.yaml -f db/mysql-statefulset.yaml
+   ```
+
+4. **Deploy RabbitMQ:**
+
+   Apply the following command to deploy RabbitMQ:
+
+   ```bash
+   kubectl apply -f rabbit/rabbitmq-deployment.yaml
+   ```
+
+5. **Retrieve the Service Account Token:**
 
    Use the following command to get the token for the `ricardofood-sa` service account, which will be used in Jenkins:
 
@@ -48,7 +62,7 @@ To test the RicardoFood project in a Minikube environment, follow these steps:
 
    This token can then be added to Jenkins for authentication and access to the Kubernetes cluster.
 
-4. **Obtain the Kubernetes `SERVER_URL`:**
+6. **Obtain the Kubernetes `SERVER_URL`:**
 
    To get the `SERVER_URL` needed for Kubernetes configurations in Jenkins, execute the following command:
 
@@ -58,7 +72,7 @@ To test the RicardoFood project in a Minikube environment, follow these steps:
 
    The output will include the URL of the Kubernetes control plane, which you can use as the `SERVER_URL` in your Jenkins configuration.
 
-5. **Connect Minikube Network to Jenkins Container (if Minikube is running in Docker):**
+7. **Connect Minikube Network to Jenkins Container (if Minikube is running in Docker):**
 
    If you are running Minikube inside Docker, you need to connect the Minikube network to the Jenkins container to allow Jenkins to interact with the Kubernetes cluster:
 
