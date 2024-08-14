@@ -2,21 +2,21 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: ricardofood
-  name: eureka-deployment
+  name: gateway-deployment
 spec:
   replicas: 1
   template:
     metadata:
-      name: eureka
+      name: gateway
       labels:
-        app: eureka
+        app: gateway
     spec:
       containers:
-      - name: eureka-container
-        image: ricardo85x/ricardofood-eureka:latest
+      - name: gateway-container
+        image: ricardo85x/ricardofood-gateway:latest
         envFrom:
           - configMapRef:
-              name: eureka-configmap
+              name: gateway-configmap
         resources:
           requests:
             cpu: 2000m
@@ -26,4 +26,4 @@ spec:
             memory: 5Gi
   selector:
     matchLabels:
-      app: eureka
+      app: gateway

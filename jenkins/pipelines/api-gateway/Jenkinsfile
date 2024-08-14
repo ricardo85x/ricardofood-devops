@@ -8,13 +8,37 @@ pipeline {
     
     environment {
         SCANNER_HOME= tool 'sonar-scanner'
+    } agent any
+    
+    tools {
+        maven 'maven3'
+        jdk 'jdk17'
     }
     
+    environment {
+        // Sonar configuration
+        SCANNER_HOME = tool 'sonar-scanner'
+        // Kubernertes configuration
+        CA_CERTIFICATE = '' 
+        CLUSTER_NAME = 'minikube'
+        CONTEXT_NAME = 'minikube'
+        K8_CREDENTIALS_ID = 'k8-token'
+        NAMESPACE = 'ricardofood'
+        SERVER_URL = 'https://192.168.49.2:8443'
+    }
 
     stages {
         stage('Git checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/ricardo85x/ricardofood-api-gateway'
+            }
+        }
+
+        stage('Git checkout DevOps') {
+            steps {
+                dir('devops') {
+                    git branch: 'main', url: 'https://github.com/ricardo85x/ricardofood-devops'
+                }
             }
         }
         
@@ -66,7 +90,9 @@ pipeline {
 
                     echo "Building version: ${version}"
 
-                    sh "docker build --build-arg JAR_FILE=gateway-${version}.jar -t ricardo85x/ricardofood-gateway:${version} -f docker/Dockerfile ."
+                    sh "mv -f ./target/gateway-${version}.jar ./target/gateway.jar"
+
+                    sh "docker build -t ricardo85x/ricardofood-gateway:${version} -f devops/jenkins/pipelines/api-gateway/Dockerfile ."
                     sh "docker tag ricardo85x/ricardofood-gateway:${version} ricardo85x/ricardofood-gateway:latest"
                     
                 }
@@ -90,8 +116,17 @@ pipeline {
                         sh "docker push ricardo85x/ricardofood-gateway:${version}"
                         sh "docker push ricardo85x/ricardofood-gateway:latest"
                     }   
+                }    
+            }
+        }
+
+        stage('Kubernetes Deploy') {
+            steps {
+                withKubeConfig(caCertificate: env.CA_CERTIFICATE, clusterName: env.CLUSTER_NAME, contextName: env.CONTEXT_NAME, credentialsId: env.K8_CREDENTIALS_ID, namespace: env.NAMESPACE, restrictKubeConfigAccess: false, serverUrl: env.SERVER_URL) {
+                    sh "kubectl apply -f devops/kubernetes/gateway/gateway-configmap.yaml -n ${env.NAMESPACE}"
+                    sh "kubectl apply -f devops/kubernetes/gateway/gateway-deployment.yaml -n ${env.NAMESPACE}"
+                    sh "kubectl get deployments -n ${env.NAMESPACE}"   
                 }
-                 
             }
         }
         
