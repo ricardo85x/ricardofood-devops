@@ -4,10 +4,11 @@ metadata:
   name: payment-configmap
   namespace: ricardofood
 data:
-  MYSQL_URL: "jdbc:mysql://ricardofood-db:3306/ricardofood?createDatabaseIfNotExist=true"
+  MYSQL_URL: "jdbc:mysql://mysql:3306/ricardofood?createDatabaseIfNotExist=true"
   MYSQL_USER: "root"
   MYSQL_PASSWORD: "senha123"
-  RABBITMQ_HOST: "ricardofood-rabbitmq"
+  RABBITMQ_HOST: "rabbitmq"
   RABBITMQ_PORT: "5672"
   RABBITMQ_USER: "guest"
   RABBITMQ_PASSWORD: "guest"
+  EUREKA_URL: "http://eureka:8081/eureka"

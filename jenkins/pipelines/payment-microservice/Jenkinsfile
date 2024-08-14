@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+     agent any
     
     tools {
         maven 'maven3'
@@ -7,9 +7,16 @@ pipeline {
     }
     
     environment {
-        SCANNER_HOME= tool 'sonar-scanner'
+        // Sonar configuration
+        SCANNER_HOME = tool 'sonar-scanner'
+        // Kubernertes configuration
+        CA_CERTIFICATE = '' 
+        CLUSTER_NAME = 'minikube'
+        CONTEXT_NAME = 'minikube'
+        K8_CREDENTIALS_ID = 'k8-token'
+        NAMESPACE = 'ricardofood'
+        SERVER_URL = 'https://192.168.49.2:8443'
     }
-    
 
     stages {
         stage('Git checkout') {
@@ -66,7 +73,9 @@ pipeline {
 
                     echo "Building version: ${version}"
 
-                    sh "docker build --build-arg JAR_FILE=payment-${version}.jar -t ricardo85x/ricardofood-payment:${version} -f docker/Dockerfile ."
+                    sh "mv -f ./target/payment-${version}.jar ./target/payment.jar"
+
+                    sh "docker build -t ricardo85x/ricardofood-payment:${version} -f devops/jenkins/pipelines/payment-microservice/Dockerfile ."
                     sh "docker tag ricardo85x/ricardofood-payment:${version} ricardo85x/ricardofood-payment:latest"
                     
                 }
@@ -92,6 +101,16 @@ pipeline {
                     }   
                 }
                  
+            }
+        }
+
+        stage('Kubernetes Deploy') {
+            steps {
+                withKubeConfig(caCertificate: env.CA_CERTIFICATE, clusterName: env.CLUSTER_NAME, contextName: env.CONTEXT_NAME, credentialsId: env.K8_CREDENTIALS_ID, namespace: env.NAMESPACE, restrictKubeConfigAccess: false, serverUrl: env.SERVER_URL) {
+                    sh "kubectl apply -f devops/kubernetes/payment/payment-configmap.yaml -n ${env.NAMESPACE}"
+                    sh "kubectl apply -f devops/kubernetes/payment/payment-deployment.yaml -n ${env.NAMESPACE}"
+                    sh "kubectl get deployments -n ${env.NAMESPACE}"   
+                }
             }
         }
         
