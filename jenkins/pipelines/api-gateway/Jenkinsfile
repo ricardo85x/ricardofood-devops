@@ -7,15 +7,6 @@ pipeline {
     }
     
     environment {
-        SCANNER_HOME= tool 'sonar-scanner'
-    } agent any
-    
-    tools {
-        maven 'maven3'
-        jdk 'jdk17'
-    }
-    
-    environment {
         // Sonar configuration
         SCANNER_HOME = tool 'sonar-scanner'
         // Kubernertes configuration
