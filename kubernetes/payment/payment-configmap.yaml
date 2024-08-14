@@ -12,3 +12,4 @@ data:
   RABBITMQ_USER: "guest"
   RABBITMQ_PASSWORD: "guest"
   EUREKA_URL: "http://eureka:8081/eureka"
+  PAYMENT_PORT: "8080"

@@ -4,6 +4,6 @@ metadata:
   name: mysql-configmap
   namespace: ricardofood
 data:
-  MYSQL_ROOT_PASSWORD: "mysql-service"
+  MYSQL_ROOT_PASSWORD: "senha123"
   MYSQL_DATABASE: "ricardofood-prod"
   
