@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: order-configmap
+  namespace: ricardofood
+data:
+  MYSQL_URL: "jdbc:mysql://mysql:3306/ricardofood?createDatabaseIfNotExist=true"
+  MYSQL_USER: "root"
+  MYSQL_PASSWORD: "senha123"
+  RABBITMQ_HOST: "rabbitmq"
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_USER: "guest"
+  RABBITMQ_PASSWORD: "guest"
+  EUREKA_URL: "http://eureka:8081/eureka"
+  ORDER_PORT: "8080"

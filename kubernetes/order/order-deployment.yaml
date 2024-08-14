@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: ricardofood
+  name: order-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: order
+      labels:
+        app: order
+    spec:
+      containers:
+      - name: order-container
+        image: ricardo85x/ricardofood-order:latest
+        envFrom:
+          - configMapRef:
+              name: order-configmap
+        resources:
+          requests:
+            cpu: 2000m
+            memory: 5Gi
+          limits:
+            cpu: 2000m
+            memory: 5Gi
+  selector:
+    matchLabels:
+      app: order

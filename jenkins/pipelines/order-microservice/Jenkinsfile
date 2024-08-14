@@ -1,0 +1,127 @@
+pipeline {
+     agent any
+    
+    tools {
+        maven 'maven3'
+        jdk 'jdk17'
+    }
+    
+    environment {
+        // Sonar configuration
+        SCANNER_HOME = tool 'sonar-scanner'
+        // Kubernertes configuration
+        CA_CERTIFICATE = '' 
+        CLUSTER_NAME = 'minikube'
+        CONTEXT_NAME = 'minikube'
+        K8_CREDENTIALS_ID = 'k8-token'
+        NAMESPACE = 'ricardofood'
+        SERVER_URL = 'https://192.168.49.2:8443'
+    }
+
+    stages {
+        stage('Git checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/ricardo85x/ricardofood-order-microservice'
+            }
+        }
+
+        stage('Git checkout DevOps') {
+            steps {
+                dir('devops') {
+                    git branch: 'main', url: 'https://github.com/ricardo85x/ricardofood-devops'
+                }
+            }
+        }
+        
+        stage('Compile') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('sonar') {
+                    sh "$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=ricardofood_order -Dsonar.projectName=ricardofood_order -Dsonar.java.binaries=."
+                }
+            }
+        }
+        
+        stage('OWASP Dependency Check') {
+            steps {
+                dependencyCheck additionalArguments: '', nvdCredentialsId: 'nvd-nist-key', odcInstallation: 'DC'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+        
+        stage('Deploy To Nexus') {
+            steps {
+                withMaven(globalMavenSettingsConfig: 'global-maven', jdk: 'jdk17', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
+                    sh "mvn deploy"
+                }
+            }
+        }
+        
+        stage('Build & Tag Docker Image') {
+            steps {
+                script {
+                    def version = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
+
+                    echo "Building version: ${version}"
+
+                    sh "mv -f ./target/order-${version}.jar ./target/order.jar"
+
+                    sh "docker build -t ricardo85x/ricardofood-order:${version} -f devops/jenkins/pipelines/order-microservice/Dockerfile ."
+                    sh "docker tag ricardo85x/ricardofood-order:${version} ricardo85x/ricardofood-order:latest"
+                    
+                }
+            }
+        }
+
+        stage('Trivy Scan') {
+            steps {
+                sh "trivy image ricardo85x/ricardofood-order:latest > trivy-report.txt "
+                
+            }
+        }
+
+        stage('Push The Docker Image') {
+            steps {
+                script {
+
+                    def version = sh(script: "mvn help:evaluate -Dexpression=project.version -q -DforceStdout", returnStdout: true).trim()
+
+                    withDockerRegistry(credentialsId: 'docker-hub-cred') {
+                        sh "docker push ricardo85x/ricardofood-order:${version}"
+                        sh "docker push ricardo85x/ricardofood-order:latest"
+                    }   
+                }
+                 
+            }
+        }
+
+        stage('Kubernetes Deploy') {
+            steps {
+                withKubeConfig(caCertificate: env.CA_CERTIFICATE, clusterName: env.CLUSTER_NAME, contextName: env.CONTEXT_NAME, credentialsId: env.K8_CREDENTIALS_ID, namespace: env.NAMESPACE, restrictKubeConfigAccess: false, serverUrl: env.SERVER_URL) {
+                    sh "kubectl apply -f devops/kubernetes/order/order-configmap.yaml -n ${env.NAMESPACE}"
+                    sh "kubectl apply -f devops/kubernetes/order/order-deployment.yaml -n ${env.NAMESPACE}"
+                    sh "kubectl apply -f devops/kubernetes/order/order-service.yaml -n ${env.NAMESPACE}"
+                    sh "kubectl get svc -n ${env.NAMESPACE}"   
+                }
+            }
+        }
+        
+    }
+}
