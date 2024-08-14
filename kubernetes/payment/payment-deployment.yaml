@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: ricardofood
+  name: payment-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: payment
+      labels:
+        app: payment
+    spec:
+      containers:
+      - name: payment-container
+        image: ricardo85x/ricardofood-payment:latest
+        envFrom:
+          - configMapRef:
+              name: payment-configmap
+        resources:
+          requests:
+            cpu: 2000m
+            memory: 5Gi
+          limits:
+            cpu: 2000m
+            memory: 5Gi
+  selector:
+    matchLabels:
+      app: payment

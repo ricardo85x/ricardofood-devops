@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: ricardofood
+  name: eureka-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: eureka
+      labels:
+        app: eureka
+    spec:
+      containers:
+      - name: eureka-container
+        image: ricardo85x/ricardofood-eureka:latest
+        envFrom:
+          - configMapRef:
+              name: eureka-configmap
+        resources:
+          requests:
+            cpu: 2000m
+            memory: 5Gi
+          limits:
+            cpu: 2000m
+            memory: 5Gi
+  selector:
+    matchLabels:
+      app: eureka

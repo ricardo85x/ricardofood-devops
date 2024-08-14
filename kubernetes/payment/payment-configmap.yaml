@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-configmap
+  namespace: ricardofood
+data:
+  MYSQL_URL: "jdbc:mysql://ricardofood-db:3306/ricardofood?createDatabaseIfNotExist=true"
+  MYSQL_USER: "root"
+  MYSQL_PASSWORD: "senha123"
+  RABBITMQ_HOST: "ricardofood-rabbitmq"
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_USER: "guest"
+  RABBITMQ_PASSWORD: "guest"
