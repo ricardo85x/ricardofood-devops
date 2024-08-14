@@ -1,6 +1,8 @@
 # RicardoFood DevOps Repository
 
-Welcome to the RicardoFood DevOps repository! This repository is dedicated to storing all DevOps-related configurations and scripts for the RicardoFood project.
+Welcome to the RicardoFood DevOps repository! 
+
+This repository is dedicated to storing all DevOps-related configurations and scripts for the RicardoFood project.
 
 ## Overview
 
@@ -46,7 +48,14 @@ To test the RicardoFood project in a Minikube environment, follow these steps:
 
    This token can then be added to Jenkins for authentication and access to the Kubernetes cluster.
 
+4. **Connect Minikube Network to Jenkins Container (if Minikube is running in Docker):**
+
+   If you are running Minikube inside Docker, you need to connect the Minikube network to the Jenkins container to allow Jenkins to interact with the Kubernetes cluster:
+
+   ```bash
+   docker network connect minikube jenkins
+   ```
+
 ---
 
 This setup will allow you to deploy and manage the RicardoFood project components within a Minikube environment, using the provided configurations and scripts.
-
