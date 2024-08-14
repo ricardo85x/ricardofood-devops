@@ -83,7 +83,7 @@ pipeline {
 
                     sh "mv -f ./target/eureka_server-${version}.jar ./target/eureka_server.jar"
 
-                    sh "docker build -t ricardo85x/ricardofood-eureka:${version} -f docker/Dockerfile ."
+                    sh "docker build -t ricardo85x/ricardofood-eureka:${version} -f devops/jenkins/pipelines/eureka-server/Dockerfile ."
                     sh "docker tag ricardo85x/ricardofood-eureka:${version} ricardo85x/ricardofood-eureka:latest"
                     
                 }
