@@ -48,7 +48,17 @@ To test the RicardoFood project in a Minikube environment, follow these steps:
 
    This token can then be added to Jenkins for authentication and access to the Kubernetes cluster.
 
-4. **Connect Minikube Network to Jenkins Container (if Minikube is running in Docker):**
+4. **Obtain the Kubernetes `SERVER_URL`:**
+
+   To get the `SERVER_URL` needed for Kubernetes configurations in Jenkins, execute the following command:
+
+   ```bash
+   kubectl cluster-info
+   ```
+
+   The output will include the URL of the Kubernetes control plane, which you can use as the `SERVER_URL` in your Jenkins configuration.
+
+5. **Connect Minikube Network to Jenkins Container (if Minikube is running in Docker):**
 
    If you are running Minikube inside Docker, you need to connect the Minikube network to the Jenkins container to allow Jenkins to interact with the Kubernetes cluster:
 
