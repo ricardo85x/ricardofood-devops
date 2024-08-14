@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-configmap
+  namespace: ricardofood
+data:
+  RABBITMQ_USER: "default_user_zv4U1tUfj5R86k8EarK"
+  RABBITMQ_PASSWORD: "IB_WRnmttmMxdo5QP52NrN6UXaITM6NC"
+  RABBITMQ_HOST: "rabbitmq-cluster"
+  RABBITMQ_PORT: "5672"

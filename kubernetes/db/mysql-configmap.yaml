@@ -5,5 +5,6 @@ metadata:
   namespace: ricardofood
 data:
   MYSQL_ROOT_PASSWORD: "senha123"
-  MYSQL_DATABASE: "ricardofood-prod"
+  MYSQL_USER: "root"
+  MYSQL_PASSWORD: "senha123"
   

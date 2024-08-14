@@ -17,6 +17,10 @@ spec:
         envFrom:
           - configMapRef:
               name: order-configmap
+          - configMapRef:
+              name: mysql-configmap
+          - configMapRef:
+              name: rabbitmq-configmap
         resources:
           requests:
             cpu: 2000m

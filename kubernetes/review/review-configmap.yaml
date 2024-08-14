@@ -4,9 +4,5 @@ metadata:
   name: review-configmap
   namespace: ricardofood
 data:
-  RABBITMQ_HOST: "rabbitmq"
-  RABBITMQ_PORT: "5672"
-  RABBITMQ_USER: "guest"
-  RABBITMQ_PASSWORD: "guest"
   EUREKA_URL: "http://eureka:8081/eureka"
   REVIEW_PORT: "8080"
