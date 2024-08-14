@@ -116,6 +116,7 @@ pipeline {
                 withKubeConfig(caCertificate: env.CA_CERTIFICATE, clusterName: env.CLUSTER_NAME, contextName: env.CONTEXT_NAME, credentialsId: env.K8_CREDENTIALS_ID, namespace: env.NAMESPACE, restrictKubeConfigAccess: false, serverUrl: env.SERVER_URL) {
                     sh "kubectl apply -f devops/kubernetes/gateway/gateway-configmap.yaml -n ${env.NAMESPACE}"
                     sh "kubectl apply -f devops/kubernetes/gateway/gateway-deployment.yaml -n ${env.NAMESPACE}"
+                    sh "kubectl apply -f devops/kubernetes/gateway/gateway-service.yaml -n ${env.NAMESPACE}"
                     sh "kubectl get deployments -n ${env.NAMESPACE}"   
                 }
             }
