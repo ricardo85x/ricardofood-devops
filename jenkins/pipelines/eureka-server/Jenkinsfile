@@ -7,9 +7,16 @@ pipeline {
     }
     
     environment {
-        SCANNER_HOME= tool 'sonar-scanner'
+        // Sonar configuration
+        SCANNER_HOME = tool 'sonar-scanner'
+        // Kubernertes configuration
+        CA_CERTIFICATE = '' 
+        CLUSTER_NAME = 'minikube'
+        CONTEXT_NAME = 'minikube'
+        K8_CREDENTIALS_ID = 'k8-token'
+        NAMESPACE = 'ricardofood'
+        SERVER_URL = 'https://192.168.49.2:8443'
     }
-    
 
     stages {
         stage('Git checkout') {
@@ -18,7 +25,7 @@ pipeline {
             }
         }
 
-        stage('Git checkout devops repository') {
+        stage('Git checkout DevOps') {
             steps {
                 dir('devops') {
                     git branch: 'main', url: 'https://github.com/ricardo85x/ricardofood-devops'
@@ -85,7 +92,7 @@ pipeline {
 
         stage('Trivy Scan') {
             steps {
-                sh "trivy image ricardo85x/ricardofood-eureka:latest > trivy-report.txt "
+                sh "trivy image ricardo85x/ricardofood-eureka:latest > trivy-report.txt"
                 
             }
         }
@@ -107,13 +114,12 @@ pipeline {
 
         stage('Kubernetes Deploy') {
             steps {
-                withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'k8-token', namespace: 'webapps', restrictKubeConfigAccess: false, serverUrl: ' https://172.31.15.138:6443') {
-                    sh "kubectl apply -f deploymentservice.yml -n webapps"
-                    sh "kubectl get svc -n webapps"
-    
+                withKubeConfig(caCertificate: env.CA_CERTIFICATE, clusterName: env.CLUSTER_NAME, contextName: env.CONTEXT_NAME, credentialsId: env.K8_CREDENTIALS_ID, namespace: env.NAMESPACE, restrictKubeConfigAccess: false, serverUrl: env.SERVER_URL) {
+                    sh "kubectl apply -f devops/kubernetes/eureka/eureka-configmap.yaml -n ${env.NAMESPACE}"
+                    sh "kubectl apply -f devops/kubernetes/eureka/eureka-deployment.yaml -n ${env.NAMESPACE}"
+                    sh "kubectl get deployments -n ${env.NAMESPACE}"   
                 }
             }
         }
-        
     }
 }
