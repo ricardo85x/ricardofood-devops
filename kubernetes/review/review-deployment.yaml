@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: ricardofood
+  name: review-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: review
+      labels:
+        app: review
+    spec:
+      containers:
+      - name: review-container
+        image: ricardo85x/ricardofood-review:latest
+        envFrom:
+          - configMapRef:
+              name: review-configmap
+        resources:
+          requests:
+            cpu: 2000m
+            memory: 5Gi
+          limits:
+            cpu: 2000m
+            memory: 5Gi
+  selector:
+    matchLabels:
+      app: review
